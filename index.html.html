@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Cost Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f7f7f7;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .container h1 {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input[type="number"], select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e0f7fa;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>College Cost Calculator</h1>
+    <label for="tuition">Tuition and Fees per Year ($):</label>
+    <input type="number" id="tuition" required>
+
+    <label for="roomBoard">Room and Board per Year ($):</label>
+    <input type="number" id="roomBoard" required>
+
+    <label for="outOfState">Are you an out-of-state student?</label>
+    <select id="outOfState">
+        <option value="no">No</option>
+        <option value="yes">Yes</option>
+    </select>
+
+    <div id="outStateFeeDiv" style="display: none;">
+        <label for="outStateFee">Out-of-State Fee per Year ($):</label>
+        <input type="number" id="outStateFee">
+    </div>
+
+    <h3>Scholarships</h3>
+    <label for="pellGrant">Pell Grant ($):</label>
+    <input type="number" id="pellGrant" value="0">
+
+    <label for="collegeScholarship">College Scholarships ($):</label>
+    <input type="number" id="collegeScholarship" value="0">
+
+    <label for="privateScholarship">Private Scholarships ($):</label>
+    <input type="number" id="privateScholarship" value="0">
+
+    <label for="stateScholarship">State-based Scholarships ($):</label>
+    <input type="number" id="stateScholarship" value="0">
+
+    <label for="otherScholarships">Other Scholarships (athletic, band, etc.) ($):</label>
+    <input type="number" id="otherScholarships" value="0">
+
+    <label for="allOther">All Other Sources of Aid ($):</label>
+    <input type="number" id="allOther" value="0">
+
+    <button onclick="calculateCost()">Calculate Total Cost</button>
+
+    <div class="result" id="result" style="display: none;">
+        <h3>Total Cost Breakdown:</h3>
+        <p id="costBreakdown"></p>
+        <p id="totalAnnualCost"></p>
+        <p id="totalScholarships"></p>
+        <p id="remainingCost"></p>
+    </div>
+</div>
+
+<script>
+    document.getElementById("outOfState").addEventListener("change", function () {
+        var outOfStateSelect = document.getElementById("outOfState").value;
+        var outStateFeeDiv = document.getElementById("outStateFeeDiv");
+        if (outOfStateSelect === "yes") {
+            outStateFeeDiv.style.display = "block";
+        } else {
+            outStateFeeDiv.style.display = "none";
+        }
+    });
+
+    function calculateCost() {
+        // Get the input values
+        var tuition = parseFloat(document.getElementById("tuition").value) || 0;
+        var roomBoard = parseFloat(document.getElementById("roomBoard").value) || 0;
+        var outOfState = document.getElementById("outOfState").value;
+        var outStateFee = parseFloat(document.getElementById("outStateFee").value) || 0;
+
+        // Get scholarship inputs
+        var pellGrant = parseFloat(document.getElementById("pellGrant").value) || 0;
+        var collegeScholarship = parseFloat(document.getElementById("collegeScholarship").value) || 0;
+        var privateScholarship = parseFloat(document.getElementById("privateScholarship").value) || 0;
+        var stateScholarship = parseFloat(document.getElementById("stateScholarship").value) || 0;
+        var otherScholarships = parseFloat(document.getElementById("otherScholarships").value) || 0;
+        var allOther = parseFloat(document.getElementById("allOther").value) || 0;
+
+        // Calculate total annual cost
+        var totalCost = tuition + roomBoard + (outOfState === "yes" ? outStateFee : 0);
+
+        // Calculate total scholarships
+        var totalScholarships = pellGrant + collegeScholarship + privateScholarship + stateScholarship + otherScholarships + allOther;
+
+        // Calculate remaining cost
+        var remainingCost = totalCost - totalScholarships;
+
+        // Prepare cost breakdown
+        var costBreakdown = `
+            <strong>Tuition and Fees:</strong> $${tuition.toFixed(2)}<br>
+            <strong>Room and Board:</strong> $${roomBoard.toFixed(2)}<br>
+        `;
+        if (outOfState === "yes") {
+            costBreakdown += `<strong>Out-of-State Fee:</strong> $${outStateFee.toFixed(2)}<br>`;
+        }
+
+        // Prepare scholarship breakdown
+        var scholarshipBreakdown = `
+            <strong>Pell Grant:</strong> $${pellGrant.toFixed(2)}<br>
+            <strong>College Scholarships:</strong> $${collegeScholarship.toFixed(2)}<br>
+            <strong>Private Scholarships:</strong> $${privateScholarship.toFixed(2)}<br>
+            <strong>State-based Scholarships:</strong> $${stateScholarship.toFixed(2)}<br>
+            <strong>Other Scholarships:</strong> $${otherScholarships.toFixed(2)}<br>
+            <strong>All Other Sources of Aid:</strong> $${allOther.toFixed(2)}<br>
+        `;
+
+        // Prepare remaining cost breakdown
+        var remainingCostText = remainingCost > 0 ? `<strong>Remaining Cost:</strong> $${remainingCost.toFixed(2)}` : `<strong>Remaining Cost:</strong> $0.00`;
+
+        // Display the results
+        document.getElementById("costBreakdown").innerHTML = costBreakdown;
+        document.getElementById("totalAnnualCost").innerHTML = `<strong>Total Annual Cost:</strong> $${totalCost.toFixed(2)}`;
+        document.getElementById("totalScholarships").innerHTML = `<strong>Total Scholarships and Aid:</strong> $${totalScholarships.toFixed(2)}`;
+        document.getElementById("remainingCost").innerHTML = remainingCostText;
+        document.getElementById("result").style.display = "block";
+    }
+</script>
+
+</body>
+</html>
